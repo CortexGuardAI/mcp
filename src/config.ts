@@ -27,33 +27,39 @@ const MIN_TOKEN_LENGTH = 10;
 const SERVER_URL = 'https://cortex-context-mcp.vercel.app';
 
 export function parseConfig(argv: string[]): MCPConfig {
-  const args: { [key: string]: any } = {};
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (arg.startsWith('--')) {
-      const key = arg.substring(2);
-      const nextArg = argv[i + 1];
-      if (nextArg && !nextArg.startsWith('--')) {
-        args[key] = nextArg;
-        i++; // Increment to skip the value
-      } else {
-        args[key] = true; // For flags like --verbose
-      }
-    }
-  }
+  const yargsResult = yargs(hideBin(argv))
+    .option('token', {
+      alias: 't',
+      type: 'string',
+      description: 'Authentication token',
+    })
+    .option('project-id', {
+      alias: 'p',
+      type: 'string',
+      description: 'Project ID (UUID)',
+    })
+    .option('timeout', {
+      type: 'number',
+      default: 30000,
+      description: 'Request timeout in milliseconds',
+    })
+    .option('verbose', {
+      type: 'boolean',
+      default: false,
+      description: 'Enable verbose logging',
+    })
+    .demandOption(['token', 'project-id'])
+    .help()
+    .alias('help', 'h')
+    .parseSync();
 
   const config: MCPConfig = {
     serverUrl: SERVER_URL,
-    authToken: args['token'],
-    projectId: args['project-id'],
-    timeout: parseInt(args['timeout'], 10) || 30000,
-    verbose: args['verbose'] || false,
+    authToken: yargsResult.token,
+    projectId: yargsResult['project-id'],
+    timeout: yargsResult.timeout,
+    verbose: yargsResult.verbose,
   };
-
-  // Validate required fields
-  if (!config.authToken || !config.projectId) {
-    throw new Error('Auth token, and project ID are required');
-  }
 
   // Validate project ID format (UUID)
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
