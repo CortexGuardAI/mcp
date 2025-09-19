@@ -2,6 +2,12 @@
 
 MCP (Model Context Protocol) adapter for Cortex Context integration.
 
+## Getting Started
+
+To use this adapter, you need to be a registered user. Please visit our landing page to sign up and get your credentials:
+
+[https://mcp.cortexguardai.com/](https://mcp.cortexguardai.com/)
+
 ## Installation
 
 ```bash
