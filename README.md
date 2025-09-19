@@ -10,8 +10,16 @@ To use this adapter, you need to be a registered user. Please visit our landing 
 
 ## Installation
 
+You can use either `pnpm` or `npm`.
+
+**pnpm:**
 ```bash
 pnpm install @cortexguardai/mcp
+```
+
+**npm:**
+```bash
+npm install @cortexguardai/mcp
 ```
 
 ## Important: How MCP Adapters Work
@@ -22,7 +30,9 @@ pnpm install @cortexguardai/mcp
 
 ### With Claude Desktop (Recommended)
 
-1. Configure your `mcp.json` file:
+1. Configure your `mcp.json` file.
+
+**For pnpm users:**
 ```json
 {
   "mcpServers": {
@@ -39,13 +49,35 @@ pnpm install @cortexguardai/mcp
 }
 ```
 
+**For npm/npx users:**
+```json
+{
+  "mcpServers": {
+    "cortex-context": {
+      "command": "npx",
+      "args": [
+        "@cortexguardai/mcp@latest",
+        "--token", "your-auth-token",
+        "--project-id", "your-project-id"
+      ]
+    }
+  }
+}
+```
+
 2. Restart Claude Desktop
 3. The adapter will be available as a context source
 
 ### Direct Command Line (for testing only)
 
+**pnpm:**
 ```bash
 pnpm dlx @cortexguardai/mcp --token <auth-token> --project-id <project-id>
+```
+
+**npx:**
+```bash
+npx @cortexguardai/mcp --token <auth-token> --project-id <project-id>
 ```
 
 **Note:** When run directly, the adapter will start and then wait for MCP messages. This is expected behavior, not an error.
@@ -78,8 +110,12 @@ This is normal! The MCP adapter uses stdin/stdout communication and waits for MC
 
 If you encounter `invalid_literal` errors expecting "object" in tool inputSchema:
 - This was fixed in version 1.0.5+ by using explicit string literals in JSON Schema definitions
-- Ensure you're using the latest version: `pnpm add -g @cortexguardai/mcp@latest`
-- Rebuild the adapter if developing locally: `pnpm run build`
+- Ensure you're using the latest version:
+  - `pnpm add -g @cortexguardai/mcp@latest`
+  - `npm install -g @cortexguardai/mcp@latest`
+- Rebuild the adapter if developing locally:
+  - `pnpm run build`
+  - `npm run build`
 
 ### Testing connectivity
 
@@ -96,7 +132,11 @@ Should return a 401 (authentication required) response, confirming the endpoint 
 ```bash
 # Build the adapter
 pnpm run build
+# or
+npm run build
 
 # Run in development mode
 pnpm run dev
+# or
+npm run dev
 ```

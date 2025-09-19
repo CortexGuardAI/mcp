@@ -1,6 +1,6 @@
 {
   "name": "@cortexguardai/mcp",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "A Node.js-based MCP adapter for seamless integration with AI development environments.",
   "main": "./dist/index.js",
   "type": "module",
