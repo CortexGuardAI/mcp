@@ -11,7 +11,7 @@ To use this adapter, you need to be a registered user. Please visit our landing 
 ## Installation
 
 ```bash
-npm install @cortexguardai/mcp
+pnpm install @cortexguardai/mcp
 ```
 
 ## Important: How MCP Adapters Work
@@ -27,10 +27,10 @@ npm install @cortexguardai/mcp
 {
   "mcpServers": {
     "cortex-context": {
-      "command": "npx",
+      "command": "pnpm",
       "args": [
+        "dlx",
         "@cortexguardai/mcp@latest",
-        "--server", "https://cortex-context-mcp.vercel.app",
         "--token", "your-auth-token",
         "--project-id", "your-project-id"
       ]
@@ -45,7 +45,7 @@ npm install @cortexguardai/mcp
 ### Direct Command Line (for testing only)
 
 ```bash
-npx @cortexguardai/mcp --server <server-url> --token <auth-token> --project-id <project-id>
+pnpm dlx @cortexguardai/mcp --token <auth-token> --project-id <project-id>
 ```
 
 **Note:** When run directly, the adapter will start and then wait for MCP messages. This is expected behavior, not an error.
@@ -63,7 +63,6 @@ This will spawn the adapter, send an MCP initialize request, and confirm it resp
 
 ## Configuration Options
 
-- `--server, -s`: Server URL (required)
 - `--token, -t`: Authentication token (required) 
 - `--project-id, -p`: Project ID to scope the adapter to (required)
 - `--timeout`: Request timeout in milliseconds (default: 30000)
@@ -79,8 +78,8 @@ This is normal! The MCP adapter uses stdin/stdout communication and waits for MC
 
 If you encounter `invalid_literal` errors expecting "object" in tool inputSchema:
 - This was fixed in version 1.0.5+ by using explicit string literals in JSON Schema definitions
-- Ensure you're using the latest version: `npm install -g @cortexguardai/mcp@latest`
-- Rebuild the adapter if developing locally: `npm run build`
+- Ensure you're using the latest version: `pnpm add -g @cortexguardai/mcp@latest`
+- Rebuild the adapter if developing locally: `pnpm run build`
 
 ### Testing connectivity
 
@@ -96,8 +95,8 @@ Should return a 401 (authentication required) response, confirming the endpoint 
 
 ```bash
 # Build the adapter
-npm run build
+pnpm run build
 
 # Run in development mode
-npm run dev
+pnpm run dev
 ```

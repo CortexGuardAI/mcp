@@ -24,6 +24,7 @@ function isValidURL(url: string): boolean {
 
 // Token validation - minimum length check
 const MIN_TOKEN_LENGTH = 10;
+const SERVER_URL = 'https://cortex-context-mcp.vercel.app';
 
 export function parseConfig(argv: string[]): MCPConfig {
   const args: { [key: string]: any } = {};
@@ -41,11 +42,8 @@ export function parseConfig(argv: string[]): MCPConfig {
     }
   }
 
-  const rawServerUrl = args['server'] || '';
-  const cleanedServerUrl = rawServerUrl.trim().replace(/`/g, '');
-
   const config: MCPConfig = {
-    serverUrl: cleanedServerUrl,
+    serverUrl: SERVER_URL,
     authToken: args['token'],
     projectId: args['project-id'],
     timeout: parseInt(args['timeout'], 10) || 30000,
@@ -53,21 +51,14 @@ export function parseConfig(argv: string[]): MCPConfig {
   };
 
   // Validate required fields
-  if (!config.serverUrl || !config.authToken || !config.projectId) {
-    throw new Error('Server URL, auth token, and project ID are required');
+  if (!config.authToken || !config.projectId) {
+    throw new Error('Auth token, and project ID are required');
   }
 
   // Validate project ID format (UUID)
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(config.projectId)) {
     throw new Error('Project ID must be a valid UUID');
-  }
-
-  // Validate server URL format
-  if (!isValidURL(config.serverUrl)) {
-    throw new Error(
-      `Invalid server URL format. Please ensure it is a valid HTTP/HTTPS URL. Received: "${rawServerUrl}"`
-    );
   }
 
   // Validate token length
@@ -82,7 +73,7 @@ export function parseConfig(argv: string[]): MCPConfig {
   }
 
   return {
-    serverUrl: config.serverUrl.replace(/\/$/, ''), // Remove trailing slash
+    serverUrl: config.serverUrl,
     authToken: config.authToken,
     projectId: config.projectId,
     timeout: config.timeout,
