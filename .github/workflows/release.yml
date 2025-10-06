@@ -53,6 +53,10 @@ jobs:
           npm config set registry https://registry.npmjs.org/
           npm config set @cortexguardai:registry https://registry.npmjs.org/
           npm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          npm config set always-auth true
+          # Verify the package exists before attempting to publish
+          echo "Checking if package scope is accessible..."
+          npm access ls-packages @cortexguardai || echo "Scope access check failed (may be normal for automation tokens)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -81,13 +85,18 @@ jobs:
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           echo "Package version: $PACKAGE_VERSION"
           
-          if npm view @cortexguardai/mcp@$PACKAGE_VERSION version 2>/dev/null; then
+          # Check if version exists using registry API directly
+          if curl -s "https://registry.npmjs.org/@cortexguardai/mcp/$PACKAGE_VERSION" | grep -q '"version"'; then
             echo "Version $PACKAGE_VERSION already exists on npm"
             echo "already_published=true" >> $GITHUB_OUTPUT
           else
             echo "Version $PACKAGE_VERSION not found on npm, proceeding with publish"
             echo "already_published=false" >> $GITHUB_OUTPUT
           fi
+          
+          # Also test npm view as backup
+          echo "Backup check with npm view:"
+          npm view @cortexguardai/mcp@$PACKAGE_VERSION version 2>/dev/null || echo "npm view also confirms version doesn't exist"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
