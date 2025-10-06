@@ -1,110 +1,31 @@
-name: Release and Publish
+name: Publish Package to npmjs
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+          node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@cortexguardai'
-          always-auth: true
-
+      
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Configure npm auth (explicit)
-        shell: bash
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config set @cortexguardai:registry https://registry.npmjs.org/
-          npm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
-          # Verify the package scope is accessible
-          echo "Checking if package scope is accessible..."
-          npm access list packages @cortexguardai || echo "Scope access check failed (may be normal for automation tokens)"
+      
+      - run: pnpm install --frozen-lockfile
+      
+      - run: pnpm run build
+      
+      - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Verify npm authentication
-        shell: bash
-        run: |
-          echo "Using registry: $(npm config get registry)"
-          echo "Userconfig: $(npm config get userconfig)"
-          echo "Contents of npmrc (sanitized):"
-          sed 's#//registry.npmjs.org/:_authToken=.*#//registry.npmjs.org/:_authToken=[REDACTED]#' "$(npm config get userconfig)" || cat "$(npm config get userconfig)"
-          echo "Pinging registry (does not require auth)..."
-          npm ping --registry=https://registry.npmjs.org/ || echo "npm ping failed (non-blocking)"
-          echo "Attempting whoami (may 401 with Automation tokens)..."
-          if npm whoami --registry=https://registry.npmjs.org/ ; then
-            echo "whoami succeeded"
-          else
-            echo "whoami failed (likely Automation token). Proceeding regardless."
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Check if version already published
-        id: version_check
-        shell: bash
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "Package version: $PACKAGE_VERSION"
-          
-          # Check if version exists using registry API directly
-          if curl -s "https://registry.npmjs.org/@cortexguardai/mcp/$PACKAGE_VERSION" | grep -q '"version"'; then
-            echo "Version $PACKAGE_VERSION already exists on npm"
-            echo "already_published=true" >> $GITHUB_OUTPUT
-          else
-            echo "Version $PACKAGE_VERSION not found on npm, proceeding with publish"
-            echo "already_published=false" >> $GITHUB_OUTPUT
-          fi
-          
-          # Also test npm view as backup
-          echo "Backup check with npm view:"
-          npm view @cortexguardai/mcp@$PACKAGE_VERSION version 2>/dev/null || echo "npm view also confirms version doesn't exist"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to npm
-        if: steps.version_check.outputs.already_published == 'false'
-        run: npm publish --access public --provenance --registry https://registry.npmjs.org/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Skip publish (already exists)
-        if: steps.version_check.outputs.already_published == 'true'
-        run: echo "Skipping publish - version already exists on npm registry"
