@@ -50,11 +50,19 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > $NPM_CONFIG_USERCONFIG
           echo "registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
           echo "@cortexguardai:registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
+          echo "Debug: NPM config file location: $NPM_CONFIG_USERCONFIG"
+          echo "Debug: NPM config file contents:"
+          cat $NPM_CONFIG_USERCONFIG
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify npm authentication
-        run: npm whoami
+        run: |
+          echo "Debug: Environment variables:"
+          echo "NPM_CONFIG_USERCONFIG: $NPM_CONFIG_USERCONFIG"
+          echo "NODE_AUTH_TOKEN: [REDACTED]"
+          echo "Running npm whoami..."
+          npm whoami
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
