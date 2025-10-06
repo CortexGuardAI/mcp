@@ -53,9 +53,9 @@ jobs:
           npm config set registry https://registry.npmjs.org/
           npm config set @cortexguardai:registry https://registry.npmjs.org/
           npm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
-          # Verify the package exists before attempting to publish
+          # Verify the package scope is accessible
           echo "Checking if package scope is accessible..."
-          npm access ls-packages @cortexguardai || echo "Scope access check failed (may be normal for automation tokens)"
+          npm access list packages @cortexguardai || echo "Scope access check failed (may be normal for automation tokens)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
