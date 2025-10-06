@@ -22,6 +22,8 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+          scope: '@cortexguardai'
+          always-auth: true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -45,28 +47,14 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Configure npm authentication
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > $NPM_CONFIG_USERCONFIG
-          echo "registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
-          echo "@cortexguardai:registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
-          echo "Debug: NPM config file location: $NPM_CONFIG_USERCONFIG"
-          echo "Debug: NPM config file contents:"
-          cat $NPM_CONFIG_USERCONFIG
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Verify npm authentication
         run: |
-          echo "Debug: Environment variables:"
-          echo "NPM_CONFIG_USERCONFIG: $NPM_CONFIG_USERCONFIG"
-          echo "NODE_AUTH_TOKEN: [REDACTED]"
-          echo "Running npm whoami..."
+          echo "Using registry: $(npm config get registry)"
           npm whoami
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
