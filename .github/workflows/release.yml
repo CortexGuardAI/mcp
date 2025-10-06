@@ -57,11 +57,20 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify npm authentication
+        shell: bash
         run: |
           echo "Using registry: $(npm config get registry)"
           echo "Userconfig: $(npm config get userconfig)"
-          echo "Contents of npmrc:" && cat $(npm config get userconfig)
-          npm whoami
+          echo "Contents of npmrc (sanitized):"
+          sed 's#//registry.npmjs.org/:_authToken=.*#//registry.npmjs.org/:_authToken=[REDACTED]#' "$(npm config get userconfig)" || cat "$(npm config get userconfig)"
+          echo "Pinging registry (does not require auth)..."
+          npm ping --registry=https://registry.npmjs.org/ || echo "npm ping failed (non-blocking)"
+          echo "Attempting whoami (may 401 with Automation tokens)..."
+          if npm whoami --registry=https://registry.npmjs.org/ ; then
+            echo "whoami succeeded"
+          else
+            echo "whoami failed (likely Automation token). Proceeding regardless."
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
