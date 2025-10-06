@@ -47,14 +47,26 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Configure npm auth (explicit)
+        shell: bash
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set always-auth true
+          npm config set @cortexguardai:registry https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Verify npm authentication
         run: |
           echo "Using registry: $(npm config get registry)"
+          echo "Userconfig: $(npm config get userconfig)"
+          echo "Contents of npmrc:" && cat $(npm config get userconfig)
           npm whoami
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm
-        run: npm publish --access public --provenance
+        run: npm publish --access public --provenance --registry https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
