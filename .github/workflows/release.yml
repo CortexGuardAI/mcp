@@ -47,9 +47,9 @@ jobs:
 
       - name: Configure npm authentication
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
-          echo "@cortexguardai:registry=https://registry.npmjs.org/" >> ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > $NPM_CONFIG_USERCONFIG
+          echo "registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
+          echo "@cortexguardai:registry=https://registry.npmjs.org/" >> $NPM_CONFIG_USERCONFIG
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
