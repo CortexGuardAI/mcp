@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## [1.0.32](https://github.com/CortexGuardAI/mcp/compare/v1.0.31...v1.0.32) (2025-10-06)
+
 ## [1.0.31](https://github.com/cortexguardai/mcp/compare/v1.0.30...v1.0.31) (2025-10-06)
 
 ## [1.0.30](https://github.com/cortexguardai/mcp/compare/v1.0.29...v1.0.30) (2025-10-06)
