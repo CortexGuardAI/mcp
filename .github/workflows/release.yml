@@ -51,7 +51,6 @@ jobs:
         shell: bash
         run: |
           npm config set registry https://registry.npmjs.org/
-          npm config set always-auth true
           npm config set @cortexguardai:registry https://registry.npmjs.org/
           npm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
         env:
