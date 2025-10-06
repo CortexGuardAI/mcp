@@ -46,7 +46,13 @@ jobs:
         run: pnpm run build
 
       - name: Configure npm authentication
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+          echo "@cortexguardai:registry=https://registry.npmjs.org/" >> ~/.npmrc
+
+      - name: Verify npm authentication
+        run: npm whoami
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks
