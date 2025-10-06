@@ -140,3 +140,34 @@ pnpm run dev
 # or
 npm run dev
 ```
+
+## Context-First Workflow and Tool Selection
+
+To improve tool selection and make decisions more direct, this adapter exposes tools with prompt-like descriptions that guide models toward a consistent workflow:
+
+- get_contexts
+  - Selection hint: Start here.
+  - Purpose: Check availability and fetch all context files for the current project.
+  - Behavior: Returns a JSON list of context files. If empty, proceed to `generate_initial_context`.
+
+- get_file
+  - Purpose: Read the contents of a specific context file by its UUID.
+  - Usage: Call after `get_contexts` when you know which file aligns with the current task.
+
+- add_file
+  - Purpose: Add a new context file when you already have prepared content.
+  - Hint: Prefer `generate_initial_context` for the first project file. Provide filename, content, and optional logical type.
+
+- generate_initial_context
+  - Selection hint: Use when `get_contexts` returns no files.
+  - Purpose: Create the first context file with a concise project overview (codebase structure, key modules, workflows).
+  - Inputs: `content` (required), optional `filename` (defaults to `project-context.md`), optional `file_type`.
+
+### Recommended Decision Flow
+
+- Check contexts: call `get_contexts` first.
+- If contexts exist: pick the relevant file and call `get_file`.
+- If no contexts exist: synthesize a brief overview from the codebase and call `generate_initial_context`.
+- When adding additional files: call `add_file` with the prepared content.
+
+These descriptions act like lightweight prompts to help models prioritize and focus the use of MCP tools appropriately.

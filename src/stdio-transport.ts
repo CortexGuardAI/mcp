@@ -189,7 +189,6 @@ export class StdioTransport extends EventEmitter {
     };
   }
 
-  // Alias methods for compatibility with rpc-handler
   public async send(message: MCPResponse): Promise<void> {
     this.sendMessage(message);
   }
