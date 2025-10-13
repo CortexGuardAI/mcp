@@ -83,7 +83,27 @@ export class MCPServer {
       const tools = [
         {
           name: 'get_contexts',
-          description: 'Selection hint: Start here. Use to check availability and fetch all context files for the current project. If result is empty, proceed to generate_initial_context. Returns a JSON list of context files.',
+          description: `Selection hint: Start here. Use to check availability and fetch all context files for the current project. This helps you track progress, organize complex tasks, and demonstrate thoroughness to the user.
+It also helps the user understand the progress of the task and overall progress of their requests.
+
+## When to Use This Tool
+Use this tool proactively in these scenarios:
+  1. Complex multi-step tasks - When a task requires 3 or more distinct steps or actions
+  2. Non-trivial and complex tasks - Tasks that require careful planning or multiple operations
+  3. User explicitly requests todo list - When the user directly asks you to use the todo list
+  4. User provides multiple tasks - When users provide a list of things to be done (numbered or comma-separated)
+  5. After receiving new instructions - Immediately capture user requirements as todos
+  6. When you start working on a task - Mark it as in_progress BEFORE beginning work. Ideally you should only have one todo as in_progress at a time
+  7. After completing a task - Mark it as completed and add any new follow-up tasks discovered during implementation
+
+## When NOT to Use This Tool
+Skip using this tool when:
+  1. There is only a single, straightforward task
+  2. The task is trivial and tracking it provides no organizational benefit
+  3. The task can be completed in less than 3 trivial steps
+  4. The task is purely conversational or informational
+
+If result is empty, proceed to generate_initial_context. Returns a JSON list of context files.`,
           inputSchema: {
             "type": "object",
             "properties": {},
@@ -92,13 +112,27 @@ export class MCPServer {
         },
         {
           name: 'get_file',
-          description: 'Use to read the contents of a specific context file by its UUID. Call after get_contexts when you know which file aligns with your current task.',
+          description: `Use to read the contents of a specific context file by its UUID. Call after get_contexts when you know which file aligns with your current task.
+
+## Workflow Guidelines
+1. Always call get_contexts first to see available files
+2. Select the most relevant file based on:
+   - File name relevance to your current task
+   - File type alignment with your needs
+   - Creation/modification timestamps for recent context
+3. Use the returned content to inform your development decisions
+4. If the file content is insufficient, consider calling other context files or updating existing ones
+
+## Best Practices
+- Read context files before making significant code changes
+- Use context to maintain consistency with existing patterns
+- Reference context when explaining decisions to users`,
           inputSchema: {
             "type": "object",
             "properties": {
               "file_id": {
                 "type": "string",
-                "description": "File UUID"
+                "description": "File UUID obtained from get_contexts response. This uniquely identifies the context file you want to read."
               }
             },
             "required": ["file_id"],
@@ -107,21 +141,39 @@ export class MCPServer {
         },
         {
           name: 'add_file',
-          description: 'Use to add a new context file when you already have prepared content. Prefer generate_initial_context for the first project file. Provide filename, content, and optional logical type.',
+          description: `Use to add a new context file when you already have prepared content. Prefer generate_initial_context for the first project file.
+
+## When to Use This Tool
+- Adding specific documentation for a feature or module
+- Creating task-specific context files during development
+- Storing important decisions, patterns, or conventions
+- Adding reference materials for complex implementations
+
+## Content Guidelines
+- Provide clear, structured content that will be useful for future reference
+- Include relevant code snippets, patterns, or examples
+- Document decisions, rationale, and important considerations
+- Use markdown formatting for better readability
+
+## File Naming Best Practices
+- Use descriptive names that indicate the content purpose
+- Include relevant technology or feature names
+- Use consistent naming conventions (kebab-case recommended)
+- Add appropriate file extensions (.md, .txt, .json, etc.)`,
           inputSchema: {
             "type": "object",
             "properties": {
               "filename": {
                 "type": "string",
-                "description": "Name of the file to add"
+                "description": "Descriptive name for the context file. Use clear, specific names that indicate the content purpose (e.g., 'react-component-patterns.md', 'api-authentication-flow.md')."
               },
               "content": {
                 "type": "string",
-                "description": "Content of the file"
+                "description": "Complete content of the context file. Should be well-structured, informative, and useful for future reference. Include relevant code examples, decisions, and explanations."
               },
               "file_type": {
                 "type": "string",
-                "description": "Logical file type (e.g., javascript, text, json)"
+                "description": "Logical file type that helps categorize the content (e.g., 'markdown' for documentation, 'javascript' for code snippets, 'json' for configuration examples, 'text' for general notes)."
               }
             },
             "required": ["filename", "content"],
@@ -130,24 +182,120 @@ export class MCPServer {
         },
         {
           name: 'generate_initial_context',
-          description: 'Selection hint: Use when get_contexts returns no files. Gather a concise project overview (codebase structure, key modules, workflows) and create the first context file to anchor subsequent tasks. Provide content you generated; filename defaults to project-context.md.',
+          description: `Selection hint: Use when get_contexts returns no files. Gather a concise project overview (codebase structure, key modules, workflows) and create the first context file to anchor subsequent tasks.
+
+## Purpose
+This tool creates the foundational context file that serves as the starting point for all subsequent development work. It should provide a comprehensive overview that helps maintain consistency and understanding throughout the project lifecycle.
+
+## Content Requirements
+Your generated content should include:
+1. **Project Overview** - Brief description of the project's purpose and goals
+2. **Technology Stack** - Key frameworks, libraries, and tools used
+3. **Architecture Overview** - High-level structure and key components
+4. **Development Patterns** - Coding conventions and architectural patterns
+5. **Key Workflows** - Important processes and development flows
+6. **Current Focus** - Specific areas or features being worked on
+
+## Best Practices
+- Keep content concise but comprehensive
+- Focus on information that will be useful for future development decisions
+- Include relevant file paths, component names, and key concepts
+- Update this context as the project evolves`,
           inputSchema: {
             "type": "object",
             "properties": {
               "content": {
                 "type": "string",
-                "description": "Initial context content summarizing the codebase and task focus"
+                "description": "Comprehensive initial context content that summarizes the codebase structure, technology stack, key modules, development patterns, and current task focus. This should serve as the foundation for all subsequent development work."
               },
               "filename": {
                 "type": "string",
-                "description": "Optional filename (defaults to project-context.md)"
+                "description": "Optional filename for the initial context file. If not provided, defaults to 'project-context.md'. Use descriptive names that reflect the project or focus area."
               },
               "file_type": {
                 "type": "string",
-                "description": "Optional logical file type (e.g., markdown, text)"
+                "description": "Optional logical file type that categorizes the content format. Defaults to 'markdown' for structured documentation. Other options include 'text' for plain notes or 'json' for structured data."
               }
             },
             "required": ["content"],
+            "additionalProperties": false
+          }
+        },
+        {
+          name: 'update_file',
+          description: `Use to update an existing context file by its UUID. Modify the filename and/or content of a context file. Requires the file ID, new filename, and new content.
+
+## When to Use This Tool
+- Updating context files with new information or changes
+- Refining documentation based on recent development work
+- Correcting or expanding existing context content
+- Renaming files to better reflect their current purpose
+
+## Update Guidelines
+1. **Preserve Important Information** - Don't lose valuable existing context
+2. **Expand Rather Than Replace** - Add new information while keeping relevant old content
+3. **Maintain Structure** - Keep consistent formatting and organization
+4. **Document Changes** - Consider noting what was updated and why
+
+## Best Practices
+- Review the existing content before updating to understand current state
+- Ensure the new content maintains consistency with project patterns
+- Update related context files if changes affect multiple areas
+- Use clear, descriptive filenames that reflect the updated content`,
+          inputSchema: {
+            "type": "object",
+            "properties": {
+              "file_id": {
+                "type": "string",
+                "description": "UUID of the existing context file to update. Obtain this from get_contexts response to ensure you're updating the correct file."
+              },
+              "filename": {
+                "type": "string",
+                "description": "New filename for the context file. Should be descriptive and reflect the updated content purpose. Use consistent naming conventions with appropriate file extensions."
+              },
+              "content": {
+                "type": "string",
+                "description": "Complete new content for the context file. This will replace the existing content entirely, so ensure all important information is included. Should be well-structured and comprehensive."
+              }
+            },
+            "required": ["file_id", "filename", "content"],
+            "additionalProperties": false
+          }
+        },
+        {
+          name: 'delete_file',
+          description: `Use to delete a context file by its UUID. Permanently removes the file from the project context. This action cannot be undone.
+
+## ⚠️ Important Warnings
+- **PERMANENT ACTION**: Deleted files cannot be recovered
+- **VERIFY FIRST**: Always confirm you have the correct file_id before deletion
+- **CONSIDER ALTERNATIVES**: Often updating content is better than deletion
+
+## When to Use This Tool
+- Removing outdated or incorrect context files
+- Cleaning up duplicate or redundant documentation
+- Removing context files that are no longer relevant to the project
+- Consolidating multiple files into a single, more comprehensive file
+
+## Before Deletion Checklist
+1. **Verify File ID** - Double-check you have the correct UUID from get_contexts
+2. **Review Content** - Use get_file to confirm the file content before deletion
+3. **Check Dependencies** - Ensure no other context files reference this content
+4. **Consider Archiving** - Sometimes updating with "ARCHIVED" prefix is safer than deletion
+
+## Safety Recommendations
+- Use get_contexts and get_file to verify the target file before deletion
+- Consider updating the file to mark it as deprecated instead of immediate deletion
+- Document the reason for deletion in remaining context files if relevant`,
+          inputSchema: {
+            "type": "object",
+            "properties": {
+              "file_id": {
+                "type": "string",
+                "description": "UUID of the context file to permanently delete. CRITICAL: Verify this is the correct file using get_contexts and get_file before deletion, as this action cannot be undone."
+              }
+            },
+            "required": ["file_id"],
             "additionalProperties": false
           }
         }
@@ -169,6 +317,10 @@ export class MCPServer {
           return await this.handleAddFile(args as { filename: string; content: string; file_type?: string });
         case 'generate_initial_context':
           return await this.handleGenerateInitialContext(args as { content: string; filename?: string; file_type?: string });
+        case 'update_file':
+          return await this.handleUpdateFile(args as { file_id: string; filename: string; content: string });
+        case 'delete_file':
+          return await this.handleDeleteFile(args as { file_id: string });
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -439,6 +591,110 @@ export class MCPServer {
     }
   }
 
+  private async handleUpdateFile(
+    { file_id, filename, content }: { file_id: string; filename: string; content: string }
+  ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
+    try {
+      if (!file_id || !filename || !content) {
+        return {
+          content: [{
+            type: 'text',
+            text: 'Error: file_id, filename, and content are required'
+          }],
+          isError: true
+        };
+      }
+
+      const response = await this.httpClient.put(`/api/files/${file_id}`, {
+        filename,
+        content
+      });
+
+      if (response.data?.success && response.data?.data) {
+        return {
+          content: [{
+            type: 'text',
+            text: `File updated successfully: ${response.data.data.name} (${response.data.data.id})`
+          }]
+        };
+      } else {
+        return {
+          content: [{
+            type: 'text',
+            text: `Update failed: ${response.data?.error || 'Unknown error'}`
+          }],
+          isError: true
+        };
+      }
+    } catch (error: any) {
+      this.logger.error('Error updating file:', error);
+      
+      // Handle specific error codes
+      if (error.response?.status === 413) {
+        const limits = error.response?.data?.details?.limits;
+        const limitInfo = limits ? JSON.stringify(limits) : 'Storage limit exceeded';
+        return {
+          content: [{
+            type: 'text',
+            text: `Storage limit exceeded: ${limitInfo}`
+          }],
+          isError: true
+        };
+      }
+      
+      return {
+        content: [{
+          type: 'text',
+          text: `Error updating file: ${error.response?.data?.error || error.message || 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+
+  private async handleDeleteFile(
+    { file_id }: { file_id: string }
+  ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
+    try {
+      if (!file_id) {
+        return {
+          content: [{
+            type: 'text',
+            text: 'Error: file_id is required'
+          }],
+          isError: true
+        };
+      }
+
+      const response = await this.httpClient.delete(`/api/files/${file_id}`);
+
+      if (response.data?.success) {
+        return {
+          content: [{
+            type: 'text',
+            text: response.data.message || 'File deleted successfully'
+          }]
+        };
+      } else {
+        return {
+          content: [{
+            type: 'text',
+            text: `Delete failed: ${response.data?.error || 'Unknown error'}`
+          }],
+          isError: true
+        };
+      }
+    } catch (error: any) {
+      this.logger.error('Error deleting file:', error);
+      return {
+        content: [{
+          type: 'text',
+          text: `Error deleting file: ${error.response?.data?.error || error.message || 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
 
 
 }
