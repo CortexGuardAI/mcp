@@ -10,7 +10,9 @@
   "github": {
     "release": true,
     "releaseName": "Release v${version}",
-    "releaseNotes": true,
+    "releaseNotes": {
+      "commit": "* ${commit.subject} (${sha})"
+    },
     "tokenRef": "GITHUB_TOKEN"
   },
   "npm": {
