@@ -10,7 +10,7 @@
   "github": {
     "release": true,
     "releaseName": "Release v${version}",
-    "releaseNotes": "generate",
+    "releaseNotes": true,
     "tokenRef": "GITHUB_TOKEN"
   },
   "npm": {
