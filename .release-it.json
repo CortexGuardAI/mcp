@@ -2,9 +2,9 @@
   "git": {
     "commitMessage": "chore: release v${version}",
     "tagName": "v${version}",
-    "push": false,
-    "commit": false,
-    "tag": false,
+    "push": true,
+    "commit": true,
+    "tag": true,
     "requireCleanWorkingDir": true
   },
   "github": {
