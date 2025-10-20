@@ -133,6 +133,31 @@ export interface AddFileResult {
   created_at: string;
 }
 
+export interface UpdateFileParams {
+  file_id: string;    // UUID format
+  filename: string;
+  content: string;
+}
+
+export interface UpdateFileResult {
+  id: string;
+  name: string;
+  content: string;
+  mime_type: string;
+  size: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeleteFileParams {
+  file_id: string;    // UUID format
+}
+
+export interface DeleteFileResult {
+  success: boolean;
+  message: string;
+}
+
 // Configuration Types
 export interface AdapterConfig {
   serverUrl: string;
