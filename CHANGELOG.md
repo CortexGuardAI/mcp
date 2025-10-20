@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+# [1.1.0](https://github.com/CortexGuardAI/mcp/compare/v1.0.32...v1.1.0) (2025-10-20)
+
+
+### Features
+
+* **file-management:** add update and delete file operations ([#1](https://github.com/CortexGuardAI/mcp/issues/1)) ([c09c71b](https://github.com/CortexGuardAI/mcp/commit/c09c71b45f9e582cf8202a39ba8ed6286cce90ac))
+
+
+### Reverts
+
+* Revert "chore: update release-it config to customize release notes format" ([da8eba8](https://github.com/CortexGuardAI/mcp/commit/da8eba8aa3f50614e2a6237e319b2aa51211230e))
+* Revert "ci: update release-it config to use context.changelog for release notes" ([02c861e](https://github.com/CortexGuardAI/mcp/commit/02c861e1931d879c142da2365edc37b540585794))
+
 ## [1.0.32](https://github.com/CortexGuardAI/mcp/compare/v1.0.31...v1.0.32) (2025-10-06)
 
 ## [1.0.31](https://github.com/cortexguardai/mcp/compare/v1.0.30...v1.0.31) (2025-10-06)
