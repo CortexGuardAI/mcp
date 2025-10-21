@@ -5,31 +5,43 @@ import { Config } from './types.js';
  */
 export class Logger {
   public verbose: boolean;
+  private silent: boolean;
 
-  constructor(verbose: boolean = false) {
+  constructor(verbose: boolean = false, silent: boolean = false) {
     this.verbose = verbose;
+    this.silent = silent;
   }
 
   info(message: string, ...args: any[]): void {
-    console.error(`[INFO] ${message}`, ...args);
+    if (!this.silent) {
+      console.error(`[INFO] ${message}`, ...args);
+    }
   }
 
   warn(message: string, ...args: any[]): void {
-    console.error(`[WARN] ${message}`, ...args);
+    if (!this.silent) {
+      console.error(`[WARN] ${message}`, ...args);
+    }
   }
 
   error(message: string, ...args: any[]): void {
-    console.error(`[ERROR] ${message}`, ...args);
+    if (!this.silent) {
+      console.error(`[ERROR] ${message}`, ...args);
+    }
   }
 
   debug(message: string, ...args: any[]): void {
-    if (this.verbose) {
+    if (this.verbose && !this.silent) {
       console.error(`[DEBUG] ${message}`, ...args);
     }
   }
 
   setVerbose(verbose: boolean): void {
     this.verbose = verbose;
+  }
+
+  setSilent(silent: boolean): void {
+    this.silent = silent;
   }
 }
 
