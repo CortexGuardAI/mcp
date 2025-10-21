@@ -147,12 +147,12 @@ To improve tool selection and make decisions more direct, this adapter exposes t
 
 - get_contexts
   - Selection hint: Start here.
-  - Purpose: Check availability and fetch all context files for the current project.
-  - Behavior: Returns a JSON list of context files. If empty, proceed to `generate_initial_context`.
+  - Purpose: Check availability and fetch context file metadata for the current project.
+  - Behavior: Returns a JSON list of context file metadata (id, name, type, size, timestamps) - **content is NOT included**. If empty, proceed to `generate_initial_context`.
 
 - get_file
   - Purpose: Read the contents of a specific context file by its UUID.
-  - Usage: Call after `get_contexts` when you know which file aligns with the current task.
+  - Usage: Call after `get_contexts` when you know which file aligns with the current task. This is required to access file content.
 
 - add_file
   - Purpose: Add a new context file when you already have prepared content.
@@ -165,9 +165,11 @@ To improve tool selection and make decisions more direct, this adapter exposes t
 
 ### Recommended Decision Flow
 
-- Check contexts: call `get_contexts` first.
-- If contexts exist: pick the relevant file and call `get_file`.
-- If no contexts exist: synthesize a brief overview from the codebase and call `generate_initial_context`.
-- When adding additional files: call `add_file` with the prepared content.
+- **Step 1**: Call `get_contexts` first to see available context files (metadata only).
+- **Step 2a**: If contexts exist, pick the relevant file(s) and call `get_file(id)` to retrieve content.
+- **Step 2b**: If no contexts exist, synthesize a brief overview from the codebase and call `generate_initial_context`.
+- **Step 3**: When adding additional files, call `add_file` with the prepared content.
+
+**Important**: The workflow now requires two API calls to access file content - first `get_contexts` for discovery, then `get_file` for content retrieval. This improves performance for projects with many or large context files.
 
 These descriptions act like lightweight prompts to help models prioritize and focus the use of MCP tools appropriately.

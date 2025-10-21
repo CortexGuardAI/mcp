@@ -103,7 +103,11 @@ Skip using this tool when:
   3. The task can be completed in less than 3 trivial steps
   4. The task is purely conversational or informational
 
-If result is empty, proceed to generate_initial_context. Returns a JSON list of context files.`,
+## Important: Metadata Only Response
+This tool returns context file metadata only (id, name, type, size, timestamps) - **content is NOT included**. 
+To access file content, use get_file(id) after selecting the relevant files from this list.
+
+If result is empty, proceed to generate_initial_context. Returns a JSON list of context file metadata.`,
           inputSchema: {
             "type": "object",
             "properties": {},
