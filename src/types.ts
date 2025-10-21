@@ -158,13 +158,42 @@ export interface DeleteFileResult {
   message: string;
 }
 
-// Configuration Types
+// Adapter Configuration
 export interface AdapterConfig {
   serverUrl: string;
   authToken: string;
   projectId: string;
   timeout: number;
   verbose: boolean;
+}
+
+// Configuration file structure
+export interface MCPConfigFile {
+  serverUrl?: string;
+  authToken?: string;
+  projectId?: string;
+  timeout?: number;
+  verbose?: boolean;
+  profiles?: Record<string, MCPProfile>;
+  defaultProfile?: string;
+}
+
+// Profile configuration for multi-account support
+export interface MCPProfile {
+  serverUrl?: string;
+  authToken: string;
+  projectId: string;
+  timeout?: number;
+  verbose?: boolean;
+}
+
+// Configuration source tracking
+export interface ConfigSource {
+  serverUrl: 'flag' | 'env' | 'project-config' | 'global-config' | 'default' | 'interactive';
+  authToken: 'flag' | 'env' | 'project-config' | 'global-config' | 'interactive';
+  projectId: 'flag' | 'env' | 'project-config' | 'global-config' | 'interactive';
+  timeout: 'flag' | 'env' | 'project-config' | 'global-config' | 'default' | 'interactive';
+  verbose: 'flag' | 'env' | 'project-config' | 'global-config' | 'default' | 'interactive';
 }
 
 // HTTP Client Types
