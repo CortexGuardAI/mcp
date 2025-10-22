@@ -1,33 +1,30 @@
 #!/usr/bin/env node
 import { createMCPServer } from './server.js';
-import { parseConfig, displayConfigSources } from './config.js';
+import { parseConfig } from './config.js';
 import { Logger, ErrorUtils } from './utils.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { pathToFileURL, fileURLToPath } from 'url';
 
 const version = '1.0.0';
+const logger = new Logger();
 
 async function main() {
   try {
-    const { config, sources } = await parseConfig(process.argv);
-    
-    // Create logger with silent mode when running as MCP server
-    const logger = new Logger(config.verbose, true);
-    
-    // Only show configuration info if explicitly verbose and not running as MCP server
-    if (config.verbose && process.argv.includes('--verbose')) {
-      console.log('🔧 Configuration loaded successfully');
-      displayConfigSources(sources);
-      console.log('');
-    }
+    logger.info('Starting mcp-adapter...');
+    logger.info(`Arguments: ${process.argv.join(' ')}`);
+
+    const config = parseConfig(process.argv);
+    logger.info(`Parsed configuration: ${JSON.stringify(config, null, 2)}`);
 
     const server = createMCPServer(config, logger);
 
+    logger.info('Starting MCP server...');
     await server.start();
+    logger.info('MCP server started successfully.');
   } catch (error) {
-    console.error('❌ Failed to start MCP server:', error instanceof Error ? error.message : error);
-    process.exit(1);
+    logger.error(`Failed to start mcp-adapter: ${error}`);
+    // process.exit(1);
   }
 }
 
@@ -35,17 +32,18 @@ main();
 
 // Handle unhandled promise rejections at the top level
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
+  logger.error('Unhandled Rejection at:', { promise, reason: ErrorUtils.getErrorMessage(reason) });
 });
 
 // Handle uncaught exceptions at the top level
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  process.exit(1);
+  logger.error('Uncaught Exception:', ErrorUtils.getErrorMessage(error));
+  if (logger.verbose) {
+    logger.error('Full error details:', ErrorUtils.sanitizeError(error));
+  }
 });
 
-// Check if this file is being run directly
+// Start the application
 const isDirectRun = (() => {
   try {
     const argv1 = process.argv[1];
@@ -61,9 +59,10 @@ const isDirectRun = (() => {
 
 if (isDirectRun) {
   main().catch((error) => {
-    const errorLogger = new Logger(false, false);
-    errorLogger.error('Fatal error in main:', ErrorUtils.getErrorMessage(error));
-    errorLogger.error('Full error details:', ErrorUtils.sanitizeError(error));
+    logger.error('Fatal error in main:', ErrorUtils.getErrorMessage(error));
+    if (logger.verbose) {
+      logger.error('Full error details:', ErrorUtils.sanitizeError(error));
+    }
     process.exit(1);
   });
 }
