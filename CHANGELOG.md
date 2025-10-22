@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## [1.2.1](https://github.com/CortexGuardAI/mcp/compare/v1.2.0...v1.2.1) (2025-10-22)
+
+
+### Reverts
+
+* Revert "feat(config): add flexible configuration system with multiple sources (#3)" ([e41a837](https://github.com/CortexGuardAI/mcp/commit/e41a8379c4d06950248c0843f388473aa4b4f99e)), closes [#3](https://github.com/CortexGuardAI/mcp/issues/3)
+
 # [1.2.0](https://github.com/CortexGuardAI/mcp/compare/v1.1.1...v1.2.0) (2025-10-21)
 
 
