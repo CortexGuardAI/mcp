@@ -609,16 +609,18 @@ Your generated content should include:
         };
       }
 
-      const response = await this.httpClient.put(`/api/files/${file_id}`, {
+      const response = await this.httpClient.put(`/api/mcp/contexts/${this.config.projectId}/files/${file_id}`, {
         filename,
         content
       });
 
-      if (response.data?.success && response.data?.data) {
+      // Handle both JSON-RPC and standard API response formats
+      const result = response.data?.result?.context || response.data?.data;
+      if (result) {
         return {
           content: [{
             type: 'text',
-            text: `File updated successfully: ${response.data.data.name} (${response.data.data.id})`
+            text: `File updated successfully: ${result.name || result.filename} (${result.id})`
           }]
         };
       } else {
@@ -670,13 +672,14 @@ Your generated content should include:
         };
       }
 
-      const response = await this.httpClient.delete(`/api/files/${file_id}`);
+      const response = await this.httpClient.delete(`/api/mcp/contexts/${this.config.projectId}/files/${file_id}`);
 
-      if (response.data?.success) {
+      if (response.data?.success || response.data?.message) {
+        const filename = response.data?.data?.filename || file_id;
         return {
           content: [{
             type: 'text',
-            text: response.data.message || 'File deleted successfully'
+            text: response.data.message || `File ${filename} deleted successfully`
           }]
         };
       } else {
