@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+# [1.3.0](https://github.com/CortexGuardAI/mcp/compare/v1.1.2...v1.3.0) (2025-11-11)
+
+
+### Bug Fixes
+
+* update file API endpoints to include project ID and handle response formats ([c625082](https://github.com/CortexGuardAI/mcp/commit/c62508222ca4f52662bef81bed769c680504fdf6))
+
 ## [1.1.2](https://github.com/CortexGuardAI/mcp/compare/v1.1.1...v1.1.2) (2025-10-28)
 
 ## [1.1.1](https://github.com/CortexGuardAI/mcp/compare/v1.1.0...v1.1.1) (2025-10-21)
